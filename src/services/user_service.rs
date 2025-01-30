@@ -2,6 +2,7 @@ use crate::config::database::connect_to_database;
 use crate::models::user_model::User;
 use crate::types::api_response::ApiResponse;
 use crate::types::role::Role;
+use crate::types::user_response::UserResponse;
 use crate::utils::auth_utils::hash_password;
 use bson::oid::ObjectId;
 use chrono::Utc;
@@ -85,7 +86,7 @@ impl User {
         }
     }
 
-    pub async fn get_all_users() -> Result<Vec<User>, ApiResponse<String>> {
+    pub async fn get_all_users() -> Result<Vec<UserResponse>, ApiResponse<String>> {
         let client = connect_to_database().await.map_err(|e| {
             ApiResponse::new(
                 500,
@@ -103,7 +104,18 @@ impl User {
             Ok(mut cursor) => {
                 let mut users = Vec::new();
                 while let Ok(Some(user)) = cursor.try_next().await {
-                    users.push(user);
+                    let user_response = UserResponse {
+                        _id: user._id,
+                        nim: user.nim,
+                        role: user.role,
+                        email: user.email,
+                        username: user.username,
+                        created_at: user.created_at,
+                        nidn: user.nidn,
+                        phone: user.phone,
+                        updated_at: user.updated_at,
+                    };
+                    users.push(user_response);
                 }
                 Ok(users)
             }
@@ -231,9 +243,5 @@ impl User {
                 Some(format!("Database error: {}", err)),
             )),
         }
-    }
-
-    pub fn verify_password(password: &str, password_hash: &str) -> bool {
-        bcrypt::verify(password, password_hash).unwrap_or(false)
     }
 }

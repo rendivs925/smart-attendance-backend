@@ -1,4 +1,6 @@
 use crate::constants::COOKIE_NAME;
+use crate::types::user_response::UserResponse;
+use crate::utils::auth_utils::verify_password;
 use crate::{
     models::user_model::User,
     types::api_response::ApiResponse,
@@ -45,7 +47,7 @@ pub async fn login_user_handler(credentials: web::Json<User>) -> HttpResponse {
 
     match User::find_user_by_nim(&nim).await {
         Ok(Some(user)) => {
-            if !User::verify_password(&credentials_data.password, &user.password) {
+            if !verify_password(&credentials_data.password, &user.password) {
                 return create_response::<String>(401, "Invalid credentials", None);
             }
 
@@ -60,10 +62,23 @@ pub async fn login_user_handler(credentials: web::Json<User>) -> HttpResponse {
             match jwt_token {
                 Ok(token) => {
                     let cookie = create_http_only_cookie(token);
+
+                    let user_response = UserResponse {
+                        _id: user._id,
+                        nim: user.nim,
+                        role: user.role,
+                        email: user.email,
+                        username: user.username,
+                        created_at: user.created_at,
+                        nidn: user.nidn,
+                        phone: user.phone,
+                        updated_at: user.updated_at,
+                    };
+
                     HttpResponse::Ok().cookie(cookie).json(ApiResponse::new(
                         200,
                         "Login successful!".to_string(),
-                        Some(user),
+                        Some(user_response),
                     ))
                 }
                 Err(err) => create_response::<String>(500, err, None),

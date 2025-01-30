@@ -90,3 +90,7 @@ pub fn validate_phone_number(phone: &str) -> Result<(), ValidationError> {
         Err(_) => Err(ValidationError::new("invalid_phone_number")),
     }
 }
+
+pub fn verify_password(password: &str, password_hash: &str) -> bool {
+    bcrypt::verify(password, password_hash).unwrap_or(false)
+}

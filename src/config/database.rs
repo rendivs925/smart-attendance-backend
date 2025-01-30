@@ -33,14 +33,27 @@ async fn create_unique_index(
     Ok(())
 }
 
+async fn ensure_field_exists_and_create_index(
+    collection: &mongodb::Collection<User>,
+    field: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let filter = doc! { field: { "$exists": true, "$ne": null } };
+    let count = collection.count_documents(filter).await?;
+
+    if count > 0 {
+        create_unique_index(collection, field).await?;
+    }
+    Ok(())
+}
+
 pub async fn create_unique_indexes() -> Result<(), Box<dyn std::error::Error>> {
     let client = connect_to_database().await?;
     let collection = client.database(DB_NAME).collection::<User>("users");
 
-    create_unique_index(&collection, "email").await?;
-    create_unique_index(&collection, "username").await?;
-    create_unique_index(&collection, "nim").await?;
-    create_unique_index(&collection, "nidn").await?;
+    ensure_field_exists_and_create_index(&collection, "email").await?;
+    ensure_field_exists_and_create_index(&collection, "username").await?;
+    ensure_field_exists_and_create_index(&collection, "nim").await?;
+    ensure_field_exists_and_create_index(&collection, "nidn").await?;
 
     Ok(())
 }

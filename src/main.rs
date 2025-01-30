@@ -1,9 +1,10 @@
 use actix_web::web;
 use dotenv::dotenv;
 use shuttle_actix_web::ShuttleActixWeb;
-use smart_attendance_backend::config::database::create_unique_indexes;
-use smart_attendance_backend::routes::auth_routes::configure_auth_routes;
-use smart_attendance_backend::routes::user_routes::configure_user_routes;
+use smart_attendance_backend::{
+    config::database::create_unique_indexes,
+    routes::{auth_routes::configure_auth_routes, user_routes::configure_user_routes},
+};
 
 #[shuttle_runtime::main]
 async fn main() -> ShuttleActixWeb<impl FnOnce(&mut web::ServiceConfig) + Send + Clone + 'static> {

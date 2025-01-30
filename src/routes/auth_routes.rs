@@ -8,6 +8,7 @@ pub fn configure_auth_routes(cfg: &mut web::ServiceConfig) {
             .route("", web::post().to(login_user_handler))
             .wrap(configure_cors()),
     );
+
     cfg.service(
         web::scope("/logout")
             .route("", web::delete().to(logout_user_handler))
