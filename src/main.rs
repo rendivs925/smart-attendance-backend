@@ -3,7 +3,10 @@ use dotenv::dotenv;
 use shuttle_actix_web::ShuttleActixWeb;
 use smart_attendance_backend::{
     config::database::create_unique_indexes,
-    routes::{auth_routes::configure_auth_routes, user_routes::configure_user_routes},
+    routes::{
+        attendance_routes::configure_attendance_routes, class_routes::configure_class_routes,
+        user_routes::configure_user_routes,
+    },
 };
 
 #[shuttle_runtime::main]
@@ -17,7 +20,8 @@ async fn main() -> ShuttleActixWeb<impl FnOnce(&mut web::ServiceConfig) + Send +
 
     let config = move |cfg: &mut web::ServiceConfig| {
         configure_user_routes(cfg);
-        configure_auth_routes(cfg);
+        configure_class_routes(cfg);
+        configure_attendance_routes(cfg);
     };
 
     Ok(config.into())

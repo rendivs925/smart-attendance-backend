@@ -2,7 +2,7 @@ use crate::types::status::Status;
 use bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Attendance {
     pub _id: Option<ObjectId>,
     pub student_id: ObjectId,
