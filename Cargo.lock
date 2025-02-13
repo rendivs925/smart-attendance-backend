@@ -3160,6 +3160,7 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "actix-ws",
+ "anyhow",
  "bcrypt",
  "bson",
  "chrono",

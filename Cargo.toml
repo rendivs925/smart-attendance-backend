@@ -28,3 +28,4 @@ strum_macros = "0.26"
 strum = { version = "0.26", features = ["derive"] }
 validator = { version = "0.19", features = ["derive"] }
 phonenumber = "0.3.7"
+anyhow = "1.0.95"
