@@ -5,5 +5,6 @@ pub mod models;
 pub mod repositories;
 pub mod routes;
 pub mod services;
+pub mod setup;
 pub mod types;
 pub mod utils;

@@ -1,4 +1,7 @@
-use crate::types::role::Role;
+use std::collections::HashSet;
+
+use crate::types::subscription::Subscription;
+use crate::types::{permissions::Permission, role::Role};
 use crate::utils::auth_utils::validate_phone_number;
 use bson::oid::ObjectId;
 use chrono::{DateTime, Utc};
@@ -26,14 +29,21 @@ pub struct User {
     pub phone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none", default)]
-    #[validate(length(equal = 10, message = "NIM must be exactly 10 characters"))]
-    pub nim: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none", default)]
-    #[validate(length(equal = 10, message = "NIDN must be exactly 10 characters"))]
-    pub nidn: Option<String>,
+    #[validate(length(
+        min = 5,
+        max = 20,
+        message = "User ID must be between 5 and 20 characters"
+    ))]
+    pub user_id: Option<String>,
 
     pub role: Role,
+
+    pub permissions: HashSet<Permission>,
+
+    pub subscription: Option<Subscription>,
+
+    #[serde(default)]
+    pub organization_ids: HashSet<ObjectId>,
 
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,

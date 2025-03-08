@@ -7,4 +7,8 @@ pub enum Role {
     Student,
     Teacher,
     Admin,
+    Developer,
+    Manager,
+    Employee,
+    Custom(String),
 }
