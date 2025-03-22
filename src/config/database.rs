@@ -11,6 +11,7 @@ pub const DB_NAME: &str = "smart-attendance";
 pub const USER_COL_NAME: &str = "users";
 pub const CLASS_COL_NAME: &str = "classes";
 pub const ATTENDANCE_COL_NAME: &str = "attendances";
+pub const ORGANIZATIONS_COL_NAME: &str = "organizations";
 
 pub async fn connect_to_database() -> Result<Client, MongoError> {
     let client_uri =

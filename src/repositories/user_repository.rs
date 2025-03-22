@@ -24,10 +24,6 @@ impl UserRepository {
         })
     }
 
-    pub async fn find_user_by_nim(&self, nim: &str) -> Result<Option<User>> {
-        self.collection.find_one(doc! { "nim": nim }).await
-    }
-
     pub async fn find_user_by_id(&self, user_id: &str) -> Result<Option<User>> {
         self.collection.find_one(doc! { "_id": user_id }).await
     }

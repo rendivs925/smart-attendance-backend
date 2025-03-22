@@ -1,8 +1,6 @@
 use crate::{
-    models::user_model::User,
-    repositories::user_repository::UserRepository,
-    types::user_response::UserResponse,
-    utils::auth_utils::{generate_jwt, verify_password},
+    models::user_model::User, repositories::user_repository::UserRepository,
+    utils::auth_utils::generate_jwt,
 };
 use anyhow::Result;
 use std::sync::Arc;
@@ -23,40 +21,36 @@ impl UserService {
             .map_err(anyhow::Error::from)
     }
 
-    pub async fn login_user(
-        &self,
-        nim: &str,
-        password: &str,
-    ) -> Result<Option<(UserResponse, String)>> {
+    pub async fn login_user(&self, user_id: &str) -> Result<Option<(User, String)>> {
         let user = self
             .user_repository
-            .find_user_by_nim(nim)
+            .find_user_by_id(user_id)
             .await
             .map_err(anyhow::Error::from)?;
 
         if let Some(user) = user {
-            if verify_password(password, &user.password) {
-                let token = generate_jwt(
-                    &user._id.as_ref().unwrap().to_string(),
-                    &user.role,
-                    user.email.as_deref(),
-                )
-                .unwrap();
+            let token = generate_jwt(
+                &user._id.as_ref().unwrap().to_hex(),
+                &user.role,
+                Some(&user.email),
+            )
+            .unwrap();
 
-                let user_response = UserResponse {
-                    _id: user._id,
-                    nim: user.nim,
-                    role: user.role,
-                    email: user.email,
-                    username: user.username,
-                    created_at: user.created_at,
-                    nidn: user.nidn,
-                    phone: user.phone,
-                    updated_at: user.updated_at,
-                };
+            let user_response = User {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                password_hash: user.password_hash,
+                role: user.role,
+                permissions: user.permissions.clone(),
+                organization_ids: user.organization_ids.clone(),
+                subscription_plan: user.subscription_plan.clone(),
+                status: user.status,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+            };
 
-                return Ok(Some((user_response, token)));
-            }
+            return Ok(Some((user_response, token)));
         }
         Ok(None)
     }

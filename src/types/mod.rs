@@ -1,7 +1,5 @@
-pub mod api_response;
-pub mod claims;
-pub mod permissions;
-pub mod role;
-pub mod status;
-pub mod subscription;
-pub mod user_response;
+pub mod attendance;
+pub mod auth;
+pub mod organization;
+pub mod responses;
+pub mod user;

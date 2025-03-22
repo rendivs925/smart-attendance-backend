@@ -4,10 +4,8 @@ use strum_macros::{Display, EnumString};
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Display, Serialize, Deserialize, EnumString)]
 #[strum(serialize_all = "lowercase")]
 pub enum Permission {
-    Read,
-    Write,
-    Delete,
+    ManageOrganizations,
+    ViewAttendance,
+    MarkAttendance,
     ManageUsers,
-    ManageRoles,
-    Custom(String),
 }
