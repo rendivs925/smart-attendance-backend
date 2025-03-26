@@ -32,15 +32,15 @@ impl UserService {
             let token = generate_jwt(
                 &user._id.as_ref().unwrap().to_hex(),
                 &user.role,
-                Some(&user.email),
+                Some(&user.email).unwrap().as_deref(),
             )
             .unwrap();
 
             let user_response = User {
                 _id: user._id,
-                username: user.username,
+                name: user.name,
                 email: user.email,
-                password_hash: user.password_hash,
+                password: user.password,
                 role: user.role,
                 permissions: user.permissions.clone(),
                 organization_ids: user.organization_ids.clone(),

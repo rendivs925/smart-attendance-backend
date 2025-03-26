@@ -33,7 +33,7 @@ pub async fn jwt_login_handler(
                     .map(|id| id.to_string())
                     .unwrap_or_default(),
                 &user.role,
-                Some(&user.email),
+                Some(&user.email).unwrap().as_deref(),
             ) {
                 Ok(t) => t,
                 Err(e) => {

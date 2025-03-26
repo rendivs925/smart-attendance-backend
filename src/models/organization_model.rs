@@ -3,9 +3,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::types::{
-    organization::organization_limit::OrganizationLimits, user::subscription::SubscriptionPlan,
-};
+use crate::types::organization::organization_limit::OrganizationLimits;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Validate)]
 pub struct Organization {
@@ -19,10 +17,12 @@ pub struct Organization {
     ))]
     pub name: String,
 
+    pub email: String,
+
     pub owner_id: ObjectId,
 
     #[validate(length(min = 8, message = "Password must be at least 8 characters"))]
-    pub password_hash: String,
+    pub password: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[validate(url(message = "Invalid logo URL"))]
@@ -32,25 +32,4 @@ pub struct Organization {
     pub updated_at: DateTime<Utc>,
 
     pub limits: OrganizationLimits,
-}
-
-impl Organization {
-    pub fn new(
-        id: ObjectId,
-        name: String,
-        owner_id: ObjectId,
-        password_hash: String,
-        plan: SubscriptionPlan,
-    ) -> Self {
-        Self {
-            _id: Some(id),
-            name,
-            owner_id,
-            password_hash,
-            logo_url: None,
-            created_at: Utc::now(),
-            updated_at: Utc::now(),
-            limits: plan.default_limits(),
-        }
-    }
 }

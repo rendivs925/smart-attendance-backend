@@ -1,7 +1,8 @@
+use std::collections::HashSet;
+
 use bson::oid::ObjectId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 use validator::Validate;
 
 use crate::types::user::{
@@ -18,18 +19,17 @@ pub struct User {
         max = 50,
         message = "Username must be between 3 and 50 characters"
     ))]
-    pub username: String,
+    pub name: String,
 
     #[validate(email(message = "Invalid email format"))]
-    pub email: String,
+    pub email: Option<String>,
 
     #[validate(length(min = 8, message = "Password must be at least 8 characters"))]
-    pub password_hash: String,
+    pub password: String,
 
     pub role: Role,
 
     pub permissions: HashSet<Permission>,
-
     #[serde(default)]
     pub organization_ids: HashSet<ObjectId>,
 
@@ -37,7 +37,6 @@ pub struct User {
     pub subscription_plan: Option<SubscriptionPlan>,
 
     pub status: UserStatus,
-
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }

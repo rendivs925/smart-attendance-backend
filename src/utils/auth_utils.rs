@@ -94,6 +94,6 @@ pub fn validate_phone_number(phone: &str) -> Result<(), ValidationError> {
     }
 }
 
-pub fn verify_password(password: &str, password_hash: &str) -> bool {
-    bcrypt::verify(password, password_hash).unwrap_or(false)
+pub fn verify_password(password: &str, password: &str) -> bool {
+    bcrypt::verify(password, password).unwrap_or(false)
 }

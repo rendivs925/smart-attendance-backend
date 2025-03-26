@@ -45,7 +45,7 @@ pub async fn register_new_user(
         _id: Some(ObjectId::new()),
         username,
         email,
-        password_hash: "".to_string(),
+        password: "".to_string(),
         role: Role::Admin,
         permissions: Default::default(),
         organization_ids: Default::default(),
