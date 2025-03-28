@@ -3,33 +3,28 @@ POST http://localhost:8000/login
 Content-Type: application/json
 
 {
-    "email": "admin@example.com",
-    "password": "securepassword",
-    "role": "Admin"
+    "identifier": "user2@example.com",
+    "password": "securepassword"
 }
 
-HTTP/1.1 200
+# HTTP/1.1 200
 
 # Test Logout API
 DELETE http://localhost:8000/logout
-HTTP/1.1 200
+# HTTP/1.1 200
 
 
-# Create a new Student user
+# Create a new user
 POST http://localhost:8000/users/new
 Content-Type: application/json
 
 {
-  "username": "student_user",
-  "email": "student@example.com",
-  "password": "securepassword",
-  "phone": "+628123456789",
-  "nim": "1234567890",
-  "nidn": null,
-  "role": "Student"
+  "name": "user3",
+  "phone_number": "085733300379",
+  "password": "securepassword"
 }
 
-HTTP/1.1 201
+# HTTP/1.1 201
 
 # Create a new Teacher user
 POST http://localhost:8000/users/new

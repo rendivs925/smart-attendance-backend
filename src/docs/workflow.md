@@ -1,74 +1,80 @@
-# Smart Attendance System - Workflow
+# 📌 Smart Attendance System - Workflow
 
 ## 1️⃣ Landing Page
 
-User is presented with two options:
+Users are presented with two options:
 
-- **[ Login ]** → For existing users
-- **[ Register ]** → For new users
+- **[Login]** → For existing users.
+- **[Register]** → For new users.
 
 ---
 
-## 2️⃣ Login Flow
+## 2️⃣ Registration Flow (Account Creation First)
+
+Users must create an account **before** choosing to create or join an organization.
+
+### **Step 1: User Registration**
 
 1. User enters:
-   - **Email** (personal email, not organization email)
+   - **Full Name**
+   - **Email or Phone Number** (used as a unique identifier)
    - **Password**
-   - _(Optional) Organization Email_ (if user belongs to multiple organizations)
-2. System verifies credentials:
-   - If valid, check user role:
-     - **Admin** → Redirect to **Admin Dashboard**
-     - **Staff** → Redirect to **Attendance Dashboard**
-     - **User** → Redirect to **User Dashboard**
-3. If the email is linked to multiple organizations, prompt user to select one.
-4. Generate **JWT token/session** and store for authentication.
+2. System checks:
+   - Is the email/phone already registered?
+   - Does the password meet security requirements?
+3. If valid, store user data and redirect to the **Organization Selection** page.
 
 ---
 
-## 3️⃣ Register Flow
+## 3️⃣ Organization Selection (After Registration)
 
-User chooses between:
+Once registered, users must decide:
 
-- **[ Create Organization ]** → To start a new organization
-- **[ Join Organization ]** → To join an existing organization
+- **[Create Organization]** → To start a new organization.
+- **[Join Organization]** → To join an existing organization.
+- **[My Organizations]** → If they already belong to an organization.
 
 ---
 
 ## 4️⃣ Create Organization Flow
 
+Only users with a valid **subscription plan** can create multiple organizations.
+
 1. User enters:
-   - **Admin Name**
-   - **Admin Email**
-   - **Password**
    - **Organization Name**
-   - **Organization Email**
+   - **Organization Email or Phone Number**
    - **Organization Password** (for security)
-   - **Subscription Plan** (Free / Pro / Enterprise)
-2. If Free Plan is chosen, check if the user already owns an organization:
-   - If Yes → Show error: _"You already own an organization. Please log in."_
-   - If No → Proceed
-3. System creates organization and assigns user as **Admin**.
+   - **Subscription Plan** (Only required if creating more than one organization)
+2. System checks:
+   - Does the organization already exist?
+   - Does the user have a valid subscription for multiple organizations?
+3. If valid, create the organization and assign the user as **Admin**.
 4. Redirect to **Admin Dashboard**.
 
 ---
 
 ## 5️⃣ Join Organization Flow
 
-1. User enters:
-   - **Full Name**
-   - **Personal Email**
-   - **Organization Email**
-   - **Organization Password** (for security)
-   - **Password**
-2. System verifies:
-   - Does the organization exist?
-   - Is the organization password correct?
-   - Are user credentials valid?
-   - (Optional) Does an admin need to approve the request?
-3. If valid, assign appropriate role:
-   - **Staff** → Can mark attendance, view reports, and limited settings.
-   - **User** → Can only view their own attendance.
-4. Redirect to **Dashboard**.
+Users who want to **join an existing organization** must provide:
+
+1. **Personal Email or Phone Number**
+2. **Organization Email or Phone Number**
+3. **Organization Password** (for verification)
+4. **Password**
+
+### **Validation Checks:**
+
+- Does the organization exist?
+- Is the organization password correct?
+- Is the user already in the organization?
+- (Optional) Does an admin need to approve the request?
+
+If valid, assign the appropriate role:
+
+- **Staff** → Can mark attendance, view reports, and limited settings.
+- **User** → Can only view their own attendance.
+
+Redirect to **Dashboard**.
 
 ---
 
@@ -76,24 +82,22 @@ User chooses between:
 
 ### **Admin Role**
 
-- Can add/manage users and staff
-- Can view and edit attendance records
-- Can manage organization settings
+- Can **add/manage users and staff**.
+- Can **view and edit attendance records**.
+- Can **manage organization settings**.
 
 ### **Staff Role**
 
-- Can mark attendance
-- Can view attendance reports
-- Cannot manage users or organization settings
+- Can **mark attendance**.
+- Can **view attendance reports**.
+- Cannot manage users or organization settings.
 
 ### **User Role**
 
-- Can only view their own attendance records
+- Can **only view their own attendance records**.
 
 ---
 
 ## 7️⃣ Logout
 
-- Users can log out at any time, returning to the **Landing Page**.
-
----
+Users can log out at any time, returning to the **Landing Page**.

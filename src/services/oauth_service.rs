@@ -2,7 +2,7 @@ use crate::{
     constants::{CLIENT_ID, CLIENT_SECRET, REDIRECT_URI},
     models::user_model::User,
     repositories::user_repository::UserRepository,
-    types::user::{role::Role, user_status::UserStatus},
+    types::user::{role::Role, subscription::SubscriptionPlan, user_status::UserStatus},
 };
 use actix_web::web;
 use bson::oid::ObjectId;
@@ -38,18 +38,20 @@ pub async fn exchange_code_for_token(code: &str) -> Result<HashMap<String, Strin
 
 pub async fn register_new_user(
     user_repository: web::Data<Arc<UserRepository>>,
-    username: String,
+    name: String,
     email: String,
 ) -> Result<User, String> {
     let new_user = User {
         _id: Some(ObjectId::new()),
-        username,
-        email,
+        name,
+        email: Some(email),
         password: "".to_string(),
         role: Role::Admin,
         permissions: Default::default(),
         organization_ids: Default::default(),
-        subscription_plan: None,
+        phone_number: None,
+        subscription_plan: SubscriptionPlan::Free,
+        owned_organizations: 0,
         status: UserStatus::Active,
         created_at: Utc::now(),
         updated_at: Utc::now(),

@@ -7,7 +7,7 @@ use mongodb::bson::{doc, oid::ObjectId, to_document};
 use mongodb::{error::Result, Client, Collection};
 
 pub struct UserRepository {
-    collection: Collection<User>,
+    pub collection: Collection<User>,
 }
 
 impl UserRepository {
@@ -28,6 +28,29 @@ impl UserRepository {
         self.collection.find_one(doc! { "_id": user_id }).await
     }
 
+    pub async fn find_user_by_email(&self, email: &str) -> Result<Option<User>> {
+        self.collection.find_one(doc! { "email": email }).await
+    }
+
+    pub async fn find_user_by_phone_number(&self, phone_number: &str) -> Result<Option<User>> {
+        self.collection
+            .find_one(doc! { "phone_number": phone_number })
+            .await
+    }
+
+    pub async fn find_user_by_email_or_phone_number(
+        &self,
+        identifier: &str,
+    ) -> Result<Option<User>> {
+        let filter = doc! {
+            "$or": [
+                { "email": identifier },
+                { "phone_number": identifier }
+            ]
+        };
+
+        self.collection.find_one(filter).await
+    }
     pub async fn get_all_users(&self) -> Result<Vec<User>> {
         let cursor = self.collection.find(doc! {}).await?;
         let users: Vec<User> = cursor.try_collect().await?;

@@ -1,3 +1,4 @@
+pub mod defaults;
 pub mod permissions;
 pub mod role;
 pub mod subscription;

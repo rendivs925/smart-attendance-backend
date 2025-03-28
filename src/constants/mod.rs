@@ -1,6 +1,12 @@
 use once_cell::sync::Lazy;
 use std::env;
 
+pub static BCRYPT_COST: Lazy<u32> = Lazy::new(|| {
+    env::var("BCRYPT_COST")
+        .expect("BCRYPT_COST must be set")
+        .parse()
+        .expect("BCRYPT_COST must be a valid u32")
+});
 pub static CLIENT_ID: Lazy<String> =
     Lazy::new(|| env::var("CLIENT_ID").expect("CLIENT_ID must be set"));
 pub static CLIENT_SECRET: Lazy<String> =

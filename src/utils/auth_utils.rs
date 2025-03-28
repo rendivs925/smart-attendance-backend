@@ -1,4 +1,4 @@
-use crate::constants::{COOKIE_NAME, JWT_SECRET_ENV};
+use crate::constants::{COOKIE_NAME, JWT_SECRET_KEY};
 use crate::types::auth::claims::Claims;
 use crate::types::user::role::Role;
 use actix_web::cookie::time::Duration as CookieDuration;
@@ -6,14 +6,14 @@ use actix_web::cookie::{Cookie, SameSite};
 use bcrypt::{hash, DEFAULT_COST};
 use chrono::{Duration as ChronoDuration, Utc};
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use log::{error, info};
 use phonenumber::{country, parse};
-use std::env;
 use validator::ValidationError;
 
 pub fn create_http_only_cookie(token: String) -> Cookie<'static> {
     let max_age = CookieDuration::days(7);
 
-    Cookie::build(COOKIE_NAME, token)
+    Cookie::build(COOKIE_NAME.as_str(), token)
         .http_only(true)
         .secure(true)
         .same_site(SameSite::Strict)
@@ -22,52 +22,31 @@ pub fn create_http_only_cookie(token: String) -> Cookie<'static> {
         .finish()
 }
 
-pub fn generate_jwt(google_id: &str, role: &Role, email: Option<&str>) -> Result<String, String> {
-    println!(
-        "Generating JWT for google_id: {}, role: {:?}",
-        google_id, role
-    );
+pub fn generate_jwt(user_id: &str, role: &Role, email: Option<&str>) -> Result<String, String> {
+    info!("Generating JWT for user_id: {}, role: {:?}", user_id, role);
 
-    let secret_key = match get_jwt_secret() {
-        Ok(key) => key,
-        Err(e) => {
-            println!("Error retrieving JWT secret: {}", e);
-            return Err("Failed to get JWT secret".to_string());
-        }
-    };
-
-    println!("JWT secret retrieved successfully");
+    let secret_key = JWT_SECRET_KEY.as_bytes();
 
     let expiration = Utc::now() + ChronoDuration::hours(24);
     let claims = Claims {
-        _id: google_id.to_string(),
+        _id: user_id.to_string(),
         role: role.to_string(),
         email: email.map(|e| e.to_string()),
         exp: expiration.timestamp() as usize,
     };
 
-    println!("Claims created: {:?}", claims);
+    info!("Claims created successfully");
 
     let header = Header::new(Algorithm::HS256);
 
-    match encode(
-        &header,
-        &claims,
-        &EncodingKey::from_secret(secret_key.as_bytes()),
-    ) {
-        Ok(token) => {
-            println!("JWT generated successfully");
-            Ok(token)
-        }
-        Err(_) => {
-            println!("Error generating JWT");
-            Err("Error generating JWT".to_string())
-        }
-    }
+    encode(&header, &claims, &EncodingKey::from_secret(secret_key)).map_err(|e| {
+        error!("Error generating JWT: {:?}", e);
+        format!("JWT generation failed: {}", e)
+    })
 }
 
 pub fn verify_jwt(token: &str) -> Result<Claims, String> {
-    let secret_key = get_jwt_secret()?;
+    let secret_key = &JWT_SECRET_KEY;
 
     decode::<Claims>(
         token,
@@ -76,11 +55,6 @@ pub fn verify_jwt(token: &str) -> Result<Claims, String> {
     )
     .map(|data| data.claims)
     .map_err(|_| "Error verifying JWT".to_string())
-}
-
-pub fn get_jwt_secret() -> Result<String, String> {
-    env::var(JWT_SECRET_ENV)
-        .map_err(|_| format!("{} environment variable not set", JWT_SECRET_ENV).to_string())
 }
 
 pub fn hash_password(password: &str) -> Result<String, String> {
@@ -94,6 +68,6 @@ pub fn validate_phone_number(phone: &str) -> Result<(), ValidationError> {
     }
 }
 
-pub fn verify_password(password: &str, password: &str) -> bool {
-    bcrypt::verify(password, password).unwrap_or(false)
+pub fn verify_password(password: &str, password_hash: &str) -> bool {
+    bcrypt::verify(password, password_hash).unwrap_or(false)
 }
