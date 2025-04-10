@@ -2,10 +2,9 @@ use crate::{
     constants::{CLIENT_ID, CLIENT_SECRET, REDIRECT_URI},
     models::user_model::User,
     repositories::user_repository::UserRepository,
-    types::user::{role::Role, subscription::SubscriptionPlan, user_status::UserStatus},
+    types::user::{subscription::SubscriptionPlan, user_status::UserStatus},
 };
 use actix_web::web;
-use bson::oid::ObjectId;
 use chrono::Utc;
 use reqwest::Client;
 use serde_json::Value;
@@ -42,14 +41,10 @@ pub async fn register_new_user(
     email: String,
 ) -> Result<User, String> {
     let new_user = User {
-        _id: Some(ObjectId::new()),
         name,
-        email: Some(email),
+        email,
         password: "".to_string(),
-        role: Role::Admin,
-        permissions: Default::default(),
         organization_ids: Default::default(),
-        phone_number: None,
         subscription_plan: SubscriptionPlan::Free,
         owned_organizations: 0,
         status: UserStatus::Active,

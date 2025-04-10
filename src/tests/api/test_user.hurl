@@ -20,8 +20,9 @@ Content-Type: application/json
 
 {
   "name": "user3",
-  "phone_number": "085733300379",
-  "password": "securepassword"
+  "email": "h@gmail.com",
+  "password": "securepassword",
+  "subscription_plan": "Free"
 }
 
 # HTTP/1.1 201

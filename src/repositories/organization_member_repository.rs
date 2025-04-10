@@ -6,11 +6,11 @@ use futures_util::stream::TryStreamExt;
 use mongodb::bson::{doc, oid::ObjectId, to_document};
 use mongodb::{error::Result, Client, Collection};
 
-pub struct UserRepository {
+pub struct OrganizationMemberRepository {
     pub collection: Collection<User>,
 }
 
-impl UserRepository {
+impl OrganizationMemberRepository {
     pub async fn new(client: &Client) -> Result<Self> {
         let collection = get_collection(client, USER_COL_NAME).await?;
         Ok(Self { collection })

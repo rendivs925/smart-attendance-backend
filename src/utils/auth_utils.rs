@@ -1,6 +1,5 @@
 use crate::constants::{COOKIE_NAME, JWT_SECRET_KEY};
 use crate::types::auth::claims::Claims;
-use crate::types::user::role::Role;
 use actix_web::cookie::time::Duration as CookieDuration;
 use actix_web::cookie::{Cookie, SameSite};
 use bcrypt::{hash, DEFAULT_COST};
@@ -22,16 +21,13 @@ pub fn create_http_only_cookie(token: String) -> Cookie<'static> {
         .finish()
 }
 
-pub fn generate_jwt(user_id: &str, role: &Role, email: Option<&str>) -> Result<String, String> {
-    info!("Generating JWT for user_id: {}, role: {:?}", user_id, role);
-
+pub fn generate_jwt(name: &str, email: &str) -> Result<String, String> {
     let secret_key = JWT_SECRET_KEY.as_bytes();
 
     let expiration = Utc::now() + ChronoDuration::hours(24);
     let claims = Claims {
-        _id: user_id.to_string(),
-        role: role.to_string(),
-        email: email.map(|e| e.to_string()),
+        name: name.to_owned(),
+        email: email.to_owned(),
         exp: expiration.timestamp() as usize,
     };
 

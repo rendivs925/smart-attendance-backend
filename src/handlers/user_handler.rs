@@ -1,4 +1,5 @@
 use crate::types::requests::login_request::LoginRequest;
+use crate::types::requests::register_request::RegisterRequest;
 use crate::types::responses::api_response::ApiResponse;
 use crate::{
     constants::COOKIE_NAME,
@@ -15,7 +16,7 @@ use std::sync::Arc;
 
 pub async fn create_user_handler(
     user_service: web::Data<Arc<UserService>>,
-    user: web::Json<User>,
+    user: web::Json<RegisterRequest>,
 ) -> HttpResponse {
     let new_user = user.into_inner();
 

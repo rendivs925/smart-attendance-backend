@@ -1,7 +1,5 @@
 use crate::types::user::{
-    defaults::{default_role, default_status, default_subscription_plan},
-    permissions::Permission,
-    role::Role,
+    defaults::{default_status, default_subscription_plan},
     subscription::SubscriptionPlan,
     user_status::UserStatus,
 };
@@ -13,9 +11,6 @@ use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Validate)]
 pub struct User {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    pub _id: Option<ObjectId>,
-
     #[validate(length(
         min = 3,
         max = 50,
@@ -24,25 +19,10 @@ pub struct User {
     pub name: String,
 
     #[validate(email(message = "Invalid email format"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[validate(length(
-        min = 10,
-        max = 15,
-        message = "Phone number must be between 10 and 15 digits"
-    ))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone_number: Option<String>,
+    pub email: String,
 
     #[validate(length(min = 8, message = "Password must be at least 8 characters"))]
     pub password: String,
-
-    #[serde(default = "default_role")]
-    pub role: Role,
-
-    #[serde(default)]
-    pub permissions: HashSet<Permission>,
 
     #[serde(default)]
     pub organization_ids: HashSet<ObjectId>,
