@@ -1,4 +1,4 @@
-use crate::types::user::{
+use crate::types::models::user::{
     defaults::{default_status, default_subscription_plan},
     subscription::SubscriptionPlan,
     user_status::UserStatus,
@@ -11,6 +11,8 @@ use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Validate)]
 pub struct User {
+    #[serde(default)]
+    pub _id: Option<ObjectId>,
     #[validate(length(
         min = 3,
         max = 50,

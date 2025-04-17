@@ -35,10 +35,7 @@ impl OrganizationMemberRepository {
             .await
     }
 
-    pub async fn find_user_by_email_or_phone_number(
-        &self,
-        identifier: &str,
-    ) -> Result<Option<User>> {
+    pub async fn find_user_by_identifier(&self, identifier: &str) -> Result<Option<User>> {
         let filter = doc! {
             "$or": [
                 { "email": identifier },

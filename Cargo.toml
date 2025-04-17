@@ -23,7 +23,6 @@ shuttle-actix-web = "0.51.0"
 shuttle-runtime = "0.51.0"
 tokio = { version = "1.40.0", features = ["macros", "rt", "rt-multi-thread"] }
 uuid = "1.11.0"
-bcrypt = "0.16.0"
 strum_macros = "0.26"
 strum = { version = "0.26", features = ["derive"] }
 validator = { version = "0.19", features = ["derive"] }
@@ -34,3 +33,5 @@ env_logger = "0.11.7"
 log = "0.4.27"
 regex = "1.11.1"
 email_address = "0.2.9"
+argon2 = "0.5.3"
+rand_core = "0.9.3"

@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::types::organization::organization_limit::OrganizationLimits;
+use crate::types::models::organization::organization_limit::OrganizationLimits;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Subscription {

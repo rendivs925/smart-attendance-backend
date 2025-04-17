@@ -3,11 +3,11 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::types::organization::organization_limit::OrganizationLimits;
+use crate::types::models::organization::organization_limit::OrganizationLimits;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Validate)]
 pub struct Organization {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub _id: Option<ObjectId>,
 
     #[validate(length(
@@ -28,7 +28,10 @@ pub struct Organization {
     #[validate(url(message = "Invalid logo URL"))]
     pub logo_url: Option<String>,
 
+    #[serde(default = "Utc::now")]
     pub created_at: DateTime<Utc>,
+
+    #[serde(default = "Utc::now")]
     pub updated_at: DateTime<Utc>,
 
     pub limits: OrganizationLimits,

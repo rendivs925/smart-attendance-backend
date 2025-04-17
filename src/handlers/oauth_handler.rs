@@ -50,7 +50,7 @@ pub async fn oauth2_callback_handler(
         return create_response::<String>(500, "Invalid user data from OAuth2 provider", None);
     }
 
-    match user_repository.find_user_by_id(&google_id).await {
+    match user_repository.find_user_by_identifier(&google_id).await {
         Ok(Some(user)) => build_login_response(user, &access_token),
         Ok(None) => match register_new_user(user_repository, username, email).await {
             Ok(new_user) => build_login_response(new_user, &access_token),

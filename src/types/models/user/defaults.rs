@@ -1,4 +1,6 @@
-use crate::types::user::{role::Role, subscription::SubscriptionPlan, user_status::UserStatus};
+use crate::types::models::user::{
+    role::Role, subscription::SubscriptionPlan, user_status::UserStatus,
+};
 
 pub fn default_role() -> Role {
     Role::User

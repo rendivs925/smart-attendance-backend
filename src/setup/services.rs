@@ -1,7 +1,8 @@
 use crate::{
-    repositories::organization_repository::OrganizationRepository,
-    repositories::user_repository::UserRepository,
-    services::organization_service::OrganizationService, services::user_service::UserService,
+    repositories::{
+        organization_repository::OrganizationRepository, user_repository::UserRepository,
+    },
+    services::{organization_service::OrganizationService, user_service::UserService},
 };
 use std::sync::Arc;
 

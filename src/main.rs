@@ -4,11 +4,12 @@ use env_logger;
 use log::info;
 use shuttle_actix_web::ShuttleActixWeb;
 use smart_attendance_backend::{
-    routes::organization_routes::configure_organization_routes,
-    routes::user_routes::configure_user_routes,
+    routes::{
+        auth_routes::configure_auth_routes, organization_routes::configure_organization_routes,
+        user_routes::configure_user_routes,
+    },
     setup::{database::setup_database, services::setup_services},
 };
-use std;
 
 #[shuttle_runtime::main]
 async fn main() -> ShuttleActixWeb<impl FnOnce(&mut web::ServiceConfig) + Send + Clone + 'static> {
@@ -24,9 +25,13 @@ async fn main() -> ShuttleActixWeb<impl FnOnce(&mut web::ServiceConfig) + Send +
     let client = setup_database().await;
     let (user_service, organization_service) = setup_services(&client).await;
 
+    let user_service_data = web::Data::new(user_service.clone());
+    let organization_service_data = web::Data::new(organization_service.clone());
+
     let config = move |cfg: &mut web::ServiceConfig| {
-        configure_user_routes(cfg, user_service.clone());
-        configure_organization_routes(cfg, organization_service.clone());
+        configure_user_routes(cfg, user_service_data.clone());
+        configure_auth_routes(cfg, user_service_data.clone());
+        configure_organization_routes(cfg, organization_service_data.clone());
     };
 
     info!("✅ Application started successfully");

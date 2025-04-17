@@ -1,11 +1,11 @@
-use crate::types::requests::login_request::LoginRequest;
-use crate::types::requests::register_request::RegisterRequest;
+use crate::types::requests::auth::login_request::LoginRequest;
+use crate::types::requests::auth::register_request::RegisterRequest;
+use crate::types::requests::user::update_user_request::UpdateUserRequest;
 use crate::types::responses::api_response::ApiResponse;
 use crate::{
     constants::COOKIE_NAME,
-    models::user_model::User,
     services::user_service::UserService,
-    utils::{api_utils::create_response, auth_utils::create_http_only_cookie},
+    utils::{api_utils::create_response, auth_utils::generate_cookie},
 };
 use actix_web::{
     cookie::{time::Duration, Cookie, SameSite},
@@ -37,7 +37,7 @@ pub async fn jwt_login_handler(
         .await
     {
         Ok((user, token)) => {
-            let cookie = create_http_only_cookie(token.clone());
+            let cookie = generate_cookie(token);
 
             info!("User {} logged in successfully", credentials.identifier);
 
@@ -81,9 +81,9 @@ pub async fn get_all_users_handler(user_service: web::Data<Arc<UserService>>) ->
 
 pub async fn get_user_handler(
     user_service: web::Data<Arc<UserService>>,
-    user_id: web::Path<String>,
+    identifier: web::Path<String>,
 ) -> HttpResponse {
-    match user_service.get_user(&user_id).await {
+    match user_service.get_user(&identifier).await {
         Ok(Some(user)) => create_response(200, "User found successfully", Some(user)),
         Ok(None) => create_response::<String>(404, "User not found", None),
         Err(err) => create_response(500, "Error fetching user", Some(err.to_string())),
@@ -92,11 +92,11 @@ pub async fn get_user_handler(
 
 pub async fn update_user_handler(
     user_service: web::Data<Arc<UserService>>,
-    user_id: web::Path<String>,
-    user: web::Json<User>,
+    identifier: web::Path<String>,
+    user: web::Json<UpdateUserRequest>,
 ) -> HttpResponse {
     user_service
-        .update_user(&user_id, user.into_inner())
+        .update_user(&identifier, user.into_inner())
         .await
         .map(|updated_user| create_response(200, "User updated successfully", Some(updated_user)))
         .unwrap_or_else(|err| create_response(500, "Error updating user", Some(err.to_string())))
@@ -104,11 +104,11 @@ pub async fn update_user_handler(
 
 pub async fn delete_user_handler(
     user_service: web::Data<Arc<UserService>>,
-    user_id: web::Path<String>,
+    identifier: web::Path<String>,
 ) -> HttpResponse {
     user_service
-        .delete_user(&user_id)
+        .delete_user(&identifier)
         .await
-        .map(|_| create_response::<String>(204, "User deleted successfully", None))
+        .map(|_| create_response::<String>(200, "User deleted successfully", None))
         .unwrap_or_else(|err| create_response(500, "Error deleting user", Some(err.to_string())))
 }

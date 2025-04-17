@@ -4,13 +4,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use validator::Validate;
 
-use crate::types::user::role::Role;
+use crate::types::models::user::role::Role;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Validate)]
 pub struct OrganizationMember {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    pub _id: Option<ObjectId>,
-
     pub organization_id: ObjectId,
 
     #[validate(length(

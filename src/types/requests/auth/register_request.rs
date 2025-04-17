@@ -1,4 +1,6 @@
-use crate::types::user::{defaults::default_subscription_plan, subscription::SubscriptionPlan};
+use crate::types::models::user::{
+    defaults::default_subscription_plan, subscription::SubscriptionPlan,
+};
 use serde::Deserialize;
 use validator::Validate;
 

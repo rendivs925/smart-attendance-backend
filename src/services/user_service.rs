@@ -1,12 +1,16 @@
 use crate::{
-    constants::BCRYPT_COST,
     models::user_model::User,
     repositories::user_repository::UserRepository,
-    types::{requests::register_request::RegisterRequest, user::defaults::default_status},
-    utils::auth_utils::{generate_jwt, verify_password},
+    types::{
+        models::user::defaults::default_status,
+        requests::{
+            auth::register_request::RegisterRequest, user::update_user_request::UpdateUserRequest,
+        },
+    },
+    utils::auth_utils::{generate_jwt, hash_password, verify_password},
 };
 use anyhow::{anyhow, Context, Result};
-use bcrypt::hash;
+use bson::oid::ObjectId;
 use chrono::Utc;
 use std::{collections::HashSet, sync::Arc};
 use validator::Validate;
@@ -20,36 +24,28 @@ impl UserService {
         Self { user_repository }
     }
 
-    pub async fn authenticate_user(&self, email: &str, password: &str) -> Result<(User, String)> {
+    pub async fn authenticate_user(
+        &self,
+        identifier: &str,
+        password: &str,
+    ) -> Result<(User, String)> {
         let user = self
             .user_repository
-            .find_user_by_email(email)
+            .find_user_by_identifier(identifier)
             .await?
             .ok_or_else(|| anyhow!("Invalid credentials"))?;
 
-        if !verify_password(password, &user.password) {
+        if !verify_password(password, &user.password)
+            .map_err(|err| anyhow!("Password verification failed: {:?}", err))?
+        {
             return Err(anyhow!("Invalid credentials"));
         }
 
-        let token = generate_jwt(&user.name, email)
+        let token = generate_jwt(&user.name, identifier)
             .map_err(|e| anyhow!(e))
             .context("Failed to generate JWT")?;
 
         Ok((user, token))
-    }
-
-    pub async fn find_user_by_email(&self, email: &str) -> Result<Option<User>> {
-        self.user_repository
-            .find_user_by_email(&email)
-            .await
-            .map_err(anyhow::Error::from)
-    }
-
-    pub async fn find_user_by_phone_number(&self, phone_number: &str) -> Result<Option<User>> {
-        self.user_repository
-            .find_user_by_phone_number(&phone_number)
-            .await
-            .map_err(anyhow::Error::from)
     }
 
     pub async fn create_user(&self, new_user: RegisterRequest) -> Result<User> {
@@ -57,7 +53,7 @@ impl UserService {
 
         if let Some(existing) = self
             .user_repository
-            .find_user_by_email(new_user.email.as_str())
+            .find_user_by_identifier(new_user.email.as_str())
             .await?
         {
             return Err(anyhow::anyhow!(
@@ -66,13 +62,13 @@ impl UserService {
             ));
         }
 
-        let cost: u32 = *BCRYPT_COST;
-        let hashed_password = hash(&new_user.password, cost)
+        let hashed_password = hash_password(&new_user.password)
             .map_err(|e| anyhow::anyhow!("Failed to hash password: {}", e))?;
 
         let now = Utc::now();
 
         let user = User {
+            _id: Some(ObjectId::new()),
             name: new_user.name,
             email: new_user.email,
             password: hashed_password,
@@ -97,23 +93,27 @@ impl UserService {
             .map_err(anyhow::Error::from)
     }
 
-    pub async fn get_user(&self, user_id: &str) -> Result<Option<User>> {
+    pub async fn get_user(&self, identifier: &str) -> Result<Option<User>> {
         self.user_repository
-            .find_user_by_id(user_id)
+            .find_user_by_identifier(identifier)
             .await
             .map_err(anyhow::Error::from)
     }
 
-    pub async fn update_user(&self, user_id: &str, user: User) -> Result<User> {
+    pub async fn update_user(
+        &self,
+        identifier: &str,
+        user: UpdateUserRequest,
+    ) -> Result<UpdateUserRequest> {
         self.user_repository
-            .update_user(user_id, &user)
+            .update_user(identifier, user)
             .await
             .map_err(anyhow::Error::from)
     }
 
-    pub async fn delete_user(&self, user_id: &str) -> Result<()> {
+    pub async fn delete_user(&self, identifier: &str) -> Result<()> {
         self.user_repository
-            .delete_user(user_id)
+            .delete_user(identifier)
             .await
             .map_err(anyhow::Error::from)
     }

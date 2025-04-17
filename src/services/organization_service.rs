@@ -18,7 +18,7 @@ impl OrganizationService {
 
     pub async fn create_organization(&self, organization: Organization) -> Result<Organization> {
         self.organization_repository
-            .create_organization(&organization)
+            .create_organization(organization)
             .await
             .map_err(anyhow::Error::from)
     }

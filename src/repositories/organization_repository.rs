@@ -16,12 +16,13 @@ impl OrganizationRepository {
         Ok(Self { collection })
     }
 
-    pub async fn create_organization(&self, organization: &Organization) -> Result<Organization> {
-        let insert_result = self.collection.insert_one(organization).await?;
-        Ok(Organization {
-            _id: Some(insert_result.inserted_id.as_object_id().unwrap()),
-            ..organization.clone()
-        })
+    pub async fn create_organization(
+        &self,
+        mut organization: Organization,
+    ) -> Result<Organization> {
+        let insert_result = self.collection.insert_one(&organization).await?;
+        organization._id = Some(insert_result.inserted_id.as_object_id().unwrap());
+        Ok(organization)
     }
 
     pub async fn find_organization_by_id(&self, org_id: &str) -> Result<Option<Organization>> {

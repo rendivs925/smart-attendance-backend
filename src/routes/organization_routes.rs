@@ -9,13 +9,11 @@ use std::sync::Arc;
 
 pub fn configure_organization_routes(
     cfg: &mut web::ServiceConfig,
-    organization_service: Arc<OrganizationService>,
+    organization_service: web::Data<Arc<OrganizationService>>,
 ) {
-    let organization_service_data = web::Data::new(organization_service);
-
     cfg.service(
         web::scope("/organizations")
-            .app_data(organization_service_data.clone())
+            .app_data(organization_service)
             .route("/new", web::post().to(create_organization_handler))
             .route("/all", web::get().to(get_all_organizations_handler))
             .route("/{id}", web::get().to(get_organization_handler))
